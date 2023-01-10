@@ -28,6 +28,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+bootJar {
+    archiveName = 'app.jar'
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
