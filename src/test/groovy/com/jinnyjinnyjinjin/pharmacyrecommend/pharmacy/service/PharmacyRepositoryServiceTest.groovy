@@ -34,7 +34,7 @@ class PharmacyRepositoryServiceTest extends AbstractIntegrationContainerBaseTest
         def entity = pharmacyRepository.save(pharmacy)
         pharmacyRepositoryService.updateAddress(entity.getId(), modifiedAddress)
 
-        def result = pharmacyRepository.findAll()
+        def result = pharmacyRepositoryService.findAll()
 
         then:
         result.get(0).getPharmacyAddress() == modifiedAddress
@@ -56,7 +56,7 @@ class PharmacyRepositoryServiceTest extends AbstractIntegrationContainerBaseTest
         def entity = pharmacyRepository.save(pharmacy)
         pharmacyRepositoryService.updateAddressWithoutTransaction(entity.getId(), modifiedAddress)
 
-        def result = pharmacyRepository.findAll()
+        def result = pharmacyRepositoryService.findAll()
 
         then:
         result.get(0).getPharmacyAddress() != modifiedAddress

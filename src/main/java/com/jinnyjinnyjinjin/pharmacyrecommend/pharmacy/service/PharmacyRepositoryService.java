@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,11 @@ public class PharmacyRepositoryService {
             return;
         }
         entity.changePharmacyAddress(address);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Pharmacy> findAll() {
+        return pharmacyRepository.findAll();
     }
 
 }
