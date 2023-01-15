@@ -2,10 +2,13 @@ package com.jinnyjinnyjinjin.pharmacyrecommend.direction.service;
 
 import com.jinnyjinnyjinjin.pharmacyrecommend.api.dto.DocumentDto;
 import com.jinnyjinnyjinjin.pharmacyrecommend.direction.entity.Direction;
+import com.jinnyjinnyjinjin.pharmacyrecommend.direction.repository.DirectionRepository;
 import com.jinnyjinnyjinjin.pharmacyrecommend.pharmacy.service.PharmacySearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
@@ -22,8 +25,14 @@ public class DirectionService {
     private static final int MAX_SEARCH_COUNT = 3;
     // 반경 10km
     private static final double RADIUS_KM = 10.0;
-
+    private final DirectionRepository directionRepository;
     private final PharmacySearchService pharmacySearchService;
+
+    @Transactional
+    public List<Direction> saveAll(List<Direction> directionList) {
+        if (CollectionUtils.isEmpty(directionList)) return Collections.emptyList();
+        return directionRepository.saveAll(directionList);
+    }
 
     public List<Direction> buildDirectionList(DocumentDto documentDto) {
         if (ObjectUtils.isEmpty(documentDto)) return Collections.emptyList();
