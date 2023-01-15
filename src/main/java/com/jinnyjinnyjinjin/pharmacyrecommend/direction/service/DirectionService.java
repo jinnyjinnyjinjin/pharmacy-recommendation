@@ -1,6 +1,7 @@
 package com.jinnyjinnyjinjin.pharmacyrecommend.direction.service;
 
 import com.jinnyjinnyjinjin.pharmacyrecommend.api.dto.DocumentDto;
+import com.jinnyjinnyjinjin.pharmacyrecommend.api.service.KakaoCategorySearchService;
 import com.jinnyjinnyjinjin.pharmacyrecommend.direction.entity.Direction;
 import com.jinnyjinnyjinjin.pharmacyrecommend.direction.repository.DirectionRepository;
 import com.jinnyjinnyjinjin.pharmacyrecommend.pharmacy.service.PharmacySearchService;
@@ -27,6 +28,7 @@ public class DirectionService {
     private static final double RADIUS_KM = 10.0;
     private final DirectionRepository directionRepository;
     private final PharmacySearchService pharmacySearchService;
+    private final KakaoCategorySearchService kakaoCategorySearchService;
 
     @Transactional
     public List<Direction> saveAll(List<Direction> directionList) {
@@ -47,6 +49,29 @@ public class DirectionService {
                         .targetLongitude(pharmacyDto.getLongitude())
                         .targetLatitude(pharmacyDto.getLatitude())
                         .targetAddress(pharmacyDto.getPharmacyAddress())
+                        .distance(
+                                calculateDistance(documentDto.getLatitude(), documentDto.getLongitude(),
+                                        pharmacyDto.getLatitude(), pharmacyDto.getLongitude())
+                        )
+                        .build())
+                .filter(direction -> direction.getDistance() <= RADIUS_KM)
+                .sorted(Comparator.comparing(Direction::getDistance))
+                .limit(MAX_SEARCH_COUNT)
+                .collect(Collectors.toList());
+    }
+
+    public List<Direction> buildDirectionListByCategoryApi(DocumentDto documentDto) {
+        if (ObjectUtils.isEmpty(documentDto)) return Collections.emptyList();
+        return kakaoCategorySearchService.requestPharmacyCategorySearch(documentDto.getLatitude(), documentDto.getLongitude(), RADIUS_KM)
+                .getDocumentList().stream()
+                .map(pharmacyDto -> Direction.builder()
+                        .inputAddress(documentDto.getAddressName())
+                        .inputLatitude(documentDto.getLatitude())
+                        .inputLongitude(documentDto.getLongitude())
+                        .targetPharmacyName(pharmacyDto.getPlaceName())
+                        .targetLongitude(pharmacyDto.getLongitude())
+                        .targetLatitude(pharmacyDto.getLatitude())
+                        .targetAddress(pharmacyDto.getAddressName())
                         .distance(
                                 calculateDistance(documentDto.getLatitude(), documentDto.getLongitude(),
                                         pharmacyDto.getLatitude(), pharmacyDto.getLongitude())
